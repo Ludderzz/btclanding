@@ -1,0 +1,17 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+
+@utility hero-text {
+  font-weight: 900;
+  line-height: 0.8; /* Tighter line height */
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+  font-style: italic;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #fcfcfc;
+  color: #0a0e1a;
+  overflow: hidden; /* Prevents accidental scrolling */
+}
