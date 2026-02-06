@@ -2,18 +2,11 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
 
 export default async function handler(req, res) {
-  // 1. Only allow POST
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
-  }
-
+  if (req.method !== 'POST') return res.status(405).send();
+  
   const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'No email provided' });
 
-  if (!email) {
-    return res.status(400).json({ message: 'Email is required' });
-  }
-
-  // 2. Setup Auth
   const serviceAccountAuth = new JWT({
     email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
     key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
@@ -27,24 +20,21 @@ export default async function handler(req, res) {
     const sheet = doc.sheetsByIndex[0];
     const rows = await sheet.getRows();
     
-    // 3. Find row (Case-Insensitive search to be safe)
-    // We use .toRawElement() or simply row.get() depending on library version
+    // We search the raw data to avoid "Header not found" issues
     const rowToDelete = rows.find(row => {
-      const rowEmail = row.get('Email');
-      return rowEmail && rowEmail.toLowerCase() === email.toLowerCase();
+      // row._rawData[0] is the first column (Email)
+      const cellValue = row._rawData[0] || ''; 
+      return cellValue.trim().toLowerCase() === email.trim().toLowerCase();
     });
 
     if (rowToDelete) {
-      console.log(`Deleting row for: ${email}`);
-      await rowToDelete.delete(); 
-      return res.status(200).json({ message: 'Successfully unsubscribed' });
+      await rowToDelete.delete();
+      return res.status(200).json({ message: 'Removed' });
     }
     
-    console.log(`Unsubscribe attempt failed: ${email} not found in sheet.`);
-    return res.status(404).json({ message: 'Email not found in our records.' });
-
+    return res.status(404).json({ message: 'Email not found in sheet' });
   } catch (e) {
-    console.error("Unsubscribe Error:", e.message);
+    console.error("Error:", e.message);
     return res.status(500).json({ error: e.message });
   }
 }
