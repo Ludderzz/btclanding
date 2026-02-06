@@ -132,7 +132,13 @@ export default function Landing() {
           </motion.div>
         )}
       </div>
-
+{/* Add this right before the last </p> tag */}
+<button 
+  onClick={() => window.location.search = '?email=true'} 
+  className="mt-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest hover:text-red-400 transition-colors"
+>
+  Unsubscribe
+</button>
       <p className="mt-12 text-[9px] font-black text-slate-300 uppercase tracking-[0.5em]">CleanerPro 2026</p>
     </div>
   );
