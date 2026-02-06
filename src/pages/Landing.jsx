@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ShieldCheck, Mail, Loader2, Briefcase, User } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Mail, Loader2, Briefcase, User, Phone } from 'lucide-react';
 
 export default function Landing() {
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState(''); // New state for phone number
   const [status, setStatus] = useState('idle');
-  const [mode, setMode] = useState('customer'); // 'customer' or 'staff'
+  const [mode, setMode] = useState('customer');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,13 +18,15 @@ export default function Landing() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           email,
-          type: mode // This tells your API if it's a customer or staff
+          phone: mode === 'staff' ? phone : 'N/A', // Send phone only if staff
+          type: mode 
         }),
       });
 
       if (response.ok) {
         setStatus('success');
         setEmail('');
+        setPhone('');
       } else {
         setStatus('error');
       }
@@ -87,20 +90,40 @@ export default function Landing() {
         </h2>
         
         {status !== 'success' ? (
-          <form onSubmit={handleSubmit} className="relative flex flex-col md:flex-row gap-2">
-            <input 
-              type="email" 
-              required 
-              placeholder="Email address" 
-              className="flex-1 bg-white border-2 border-slate-100 px-6 py-4 rounded-full outline-none focus:border-[#10b981] font-bold text-sm" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
-            />
+          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+            <div className="relative flex flex-col md:flex-row gap-2">
+              <input 
+                type="email" 
+                required 
+                placeholder="Email address" 
+                className="flex-[2] bg-white border-2 border-slate-100 px-6 py-4 rounded-full outline-none focus:border-[#10b981] font-bold text-sm" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+              />
+              
+              {/* Conditional Phone Input with Animation */}
+              <AnimatePresence>
+                {mode === 'staff' && (
+                  <motion.input
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    type="tel"
+                    required
+                    placeholder="Phone number"
+                    className="flex-1 bg-white border-2 border-slate-100 px-6 py-4 rounded-full outline-none focus:border-[#10b981] font-bold text-sm"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
+                )}
+              </AnimatePresence>
+            </div>
+
             <button 
               type="submit" 
-              className={`px-8 py-4 rounded-full font-black uppercase text-[10px] transition-all flex items-center justify-center gap-2 text-white ${mode === 'customer' ? 'bg-[#0a0e1a] hover:bg-[#10b981]' : 'bg-[#10b981] hover:bg-[#0a0e1a]'}`}
+              className={`w-full md:w-auto self-center px-12 py-4 rounded-full font-black uppercase text-[10px] transition-all flex items-center justify-center gap-2 text-white ${mode === 'customer' ? 'bg-[#0a0e1a] hover:bg-[#10b981]' : 'bg-[#10b981] hover:bg-[#0a0e1a]'}`}
             >
-              {status === 'loading' ? <Loader2 className="animate-spin" size={16} /> : <>Register <ArrowRight size={14} /></>}
+              {status === 'loading' ? <Loader2 className="animate-spin" size={16} /> : <>{mode === 'customer' ? 'Notify Me' : 'Submit Application'} <ArrowRight size={14} /></>}
             </button>
           </form>
         ) : (

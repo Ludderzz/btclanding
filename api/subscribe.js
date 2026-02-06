@@ -31,6 +31,12 @@ export default async function handler(req, res) {
       Date: new Date().toLocaleString(),
       Type: type || 'customer' // Defaults to customer if for some reason type is missing
     });
+    await sheet.addRow({
+  Email: email,
+  Date: new Date().toLocaleString(),
+  Type: type || 'customer',
+  Phone: req.body.phone || 'N/A' // This catches the new phone field
+});
 
     return res.status(200).json({ message: 'Added to Google Sheets!' });
   } catch (e) {
