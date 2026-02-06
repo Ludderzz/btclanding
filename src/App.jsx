@@ -1,11 +1,14 @@
-import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Landing from './pages/Landing';
+import Unsubscribe from './pages/Unsubscribe';
 
-// Simple App structure to ensure something renders
 export default function App() {
   return (
-    <div className="min-h-screen bg-[#fcfcfc]">
-      <Landing />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/unsubscribe" element={<Unsubscribe />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
