@@ -8,10 +8,11 @@ import Unsubscribe from './pages/Unsubscribe';
 export default function App() {
   const [view, setView] = useState('landing');
 
-  // Check if the URL has ?email= in it when the page loads
+  // This handles the "Unsubscribe" view manually using the URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (window.location.pathname === '/unsubscribe' || params.has('email')) {
+    // If URL contains ?email=, switch to unsubscribe view automatically
+    if (params.has('email')) {
       setView('unsubscribe');
     }
   }, []);
@@ -19,13 +20,16 @@ export default function App() {
   return (
     <Layout>
       {view === 'landing' && <Landing onStartBooking={() => setView('booking')} />}
+      
       {view === 'booking' && (
         <Booking 
           onBack={() => setView('landing')} 
           onComplete={() => setView('success')} 
         />
       )}
+      
       {view === 'success' && <Success onHome={() => setView('landing')} />}
+      
       {view === 'unsubscribe' && <Unsubscribe onHome={() => setView('landing')} />}
     </Layout>
   );
